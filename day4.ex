@@ -7,9 +7,7 @@ defmodule Test do
   end
 
   defp groups_valid?(value) do
-    get_groups(value)
-      |> Enum.map(fn(g) -> length(g) end)
-      |> Enum.reduce(false, fn(g, acc) -> acc || g == 2 end)
+    get_groups(value) |> Enum.reduce(false, fn(g, acc) -> acc || length(g) == 2 end)
   end
 
   defp increasing?(n) do
