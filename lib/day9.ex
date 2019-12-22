@@ -1,4 +1,4 @@
-defmodule CPU do
+defmodule Day9 do
   import Enum
   import List
 
@@ -149,15 +149,6 @@ defmodule CPU do
 
   def run(input) do
     {:end, res} = tick({input ++ Enum.map(0..10000, fn _ -> 0 end)})
-  end
-end
-
-defmodule Benchmark do
-  def measure(function) do
-    function
-    |> :timer.tc()
-    |> elem(0)
-    |> Kernel./(1_000_000)
   end
 end
 

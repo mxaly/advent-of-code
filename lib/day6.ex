@@ -12,7 +12,7 @@ input = [
   "K)L"
 ]
 
-defmodule Test do
+defmodule Day6 do
   def prepare_structure(lines) do
     lines
     |> Enum.map(fn x -> String.split(x, ")") end)
@@ -29,7 +29,7 @@ defmodule Test do
         Enum.reduce(
           structure[start],
           structure,
-          fn point, structure -> Map.merge(structure, Test.mark(structure, point, level + 1)) end
+          fn point, structure -> Map.merge(structure, mark(structure, point, level + 1)) end
         )
 
       %{new_structure | start => {structure[start], level}}

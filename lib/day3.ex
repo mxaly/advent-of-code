@@ -1,4 +1,4 @@
-defmodule Test do
+defmodule Day3 do
   def get_path(path, []) do
     path
   end
@@ -22,13 +22,13 @@ defmodule Test do
           Enum.reduce(1..String.to_integer(rest), path, fn i, path -> [{x - i, y} | path] end)
       end
 
-    Test.get_path(path, rest_moves)
+    get_path(path, rest_moves)
   end
 
   def get_crosses(path1, path2) do
-    Set.intersection(
-      Enum.into(path1 -- [{0, 0}], HashSet.new()),
-      Enum.into(path2 -- [{0, 0}], HashSet.new())
+    MapSet.intersection(
+      Enum.into(path1 -- [{0, 0}], MapSet.new()),
+      Enum.into(path2 -- [{0, 0}], MapSet.new())
     )
   end
 
@@ -39,22 +39,20 @@ defmodule Test do
   end
 
   def process(l1, l2) do
-    path1 = Test.get_path([{0, 0}], String.split(l1, ","))
-    path2 = Test.get_path([{0, 0}], String.split(l2, ","))
+    path1 = get_path([{0, 0}], String.split(l1, ","))
+    path2 = get_path([{0, 0}], String.split(l2, ","))
 
     crosses = get_crosses(path1, path2)
-    # # closes crossing distance
 
-    sums = Enum.map(crosses, fn {x, y} -> abs(x) + abs(y) end)
-    # IO.puts("closes crossing path: #{Enum.min(sums)}")
+    # # closes crossing distance
+    Enum.map(crosses, fn {x, y} -> abs(x) + abs(y) end)
 
     # # closes crossing steps
-    steps_to_closest_cross =
-      crosses
-      |> Enum.map(fn cross ->
-        Test.path_to_point(path1, cross) + Test.path_to_point(path2, cross)
-      end)
-      |> Enum.min()
+    crosses
+    |> Enum.map(fn cross ->
+      path_to_point(path1, cross) + path_to_point(path2, cross)
+    end)
+    |> Enum.min()
 
     # 3IO.puts("closes crossing by path #{steps_to_closest_cross}")
   end

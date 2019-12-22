@@ -1,4 +1,4 @@
-defmodule CPU11 do
+defmodule Day11 do
   import Enum
   import List
   import Map
@@ -256,7 +256,7 @@ defmodule CPU11 do
     |> Enum.group_by(fn {{_x, y}, _} -> y end)
     |> Enum.map(fn {y, row} -> {y, Enum.sort_by(row, fn {{x, _}, _} -> x end)} end)
     |> Enum.sort_by(fn {k, _v} -> -k end)
-    |> Enum.map(fn {_k, row} -> CPU11.fill_row(row) |> Enum.join(",") end)
+    |> Enum.map(fn {_k, row} -> fill_row(row) |> Enum.join(",") end)
     |> Enum.join("\n")
   end
 

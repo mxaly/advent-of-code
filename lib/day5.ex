@@ -1,4 +1,4 @@
-defmodule CPU do
+defmodule Day5 do
   import Enum
   import List
 

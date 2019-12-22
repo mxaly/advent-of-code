@@ -1,4 +1,4 @@
-defmodule CPU do
+defmodule Day9Ref do
   import Enum
   import List
   import Map

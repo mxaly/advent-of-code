@@ -1,4 +1,4 @@
-defmodule Test do
+defmodule Day4 do
   defp get_groups(number) do
     number
     |> Integer.to_string()
