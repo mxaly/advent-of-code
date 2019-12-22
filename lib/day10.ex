@@ -1,8 +1,5 @@
 defmodule SpaceMap do
-  import Enum
-  import List
   import Map
-  import IEx
 
   def line_formula({x1, y1}, {x2, y2}, x) do
     m =
@@ -32,22 +29,18 @@ defmodule SpaceMap do
       end
   end
 
-  def centralize(matrix, point) do
-  end
-
   def generate_matrix(input) do
-    matrix =
-      input
-      |> Enum.map(fn line ->
-        String.split(line, "")
-        |> Enum.filter(fn x ->
-          if(x != "") do
-            x
-          end
-        end)
+    input
+    |> Enum.map(fn line ->
+      String.split(line, "")
+      |> Enum.filter(fn x ->
+        if(x != "") do
+          x
+        end
       end)
-      |> Enum.map(&Enum.with_index/1)
-      |> Enum.with_index()
+    end)
+    |> Enum.map(&Enum.with_index/1)
+    |> Enum.with_index()
   end
 
   def parse_to_map(matrix) do
@@ -106,7 +99,7 @@ defmodule SpaceMap do
 
   def get_best(points) do
     points
-    |> Enum.max_by(fn {point, value} -> value end)
+    |> Enum.max_by(fn {_point, value} -> value end)
   end
 end
 

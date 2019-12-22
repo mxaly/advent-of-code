@@ -1,8 +1,5 @@
 defmodule SpaceMapP2 do
   import Enum
-  import List
-  import Map
-  import IEx
 
   def angle_between_points({x1, y1}, {x2, y2}, {x3, y3}) do
     a = :math.pow(x2 - x1, 2) + :math.pow(y2 - y1, 2)
@@ -18,18 +15,17 @@ defmodule SpaceMapP2 do
   end
 
   def generate_matrix(input) do
-    matrix =
-      input
-      |> Enum.map(fn line ->
-        String.split(line, "")
-        |> Enum.filter(fn x ->
-          if(x != "") do
-            x
-          end
-        end)
+    input
+    |> Enum.map(fn line ->
+      String.split(line, "")
+      |> Enum.filter(fn x ->
+        if(x != "") do
+          x
+        end
       end)
-      |> Enum.map(&Enum.with_index/1)
-      |> Enum.with_index()
+    end)
+    |> Enum.map(&Enum.with_index/1)
+    |> Enum.with_index()
   end
 
   def parse_to_map(matrix) do
@@ -51,8 +47,8 @@ defmodule SpaceMapP2 do
 
   def sort_and_remove_temp_points(points) do
     points
-    |> Enum.sort_by(fn {{x, y}, org_point} -> abs(x) + abs(y) end)
-    |> Enum.map(fn {point, org_point} -> org_point end)
+    |> Enum.sort_by(fn {{x, y}, _org_point} -> abs(x) + abs(y) end)
+    |> Enum.map(fn {_point, org_point} -> org_point end)
   end
 
   def group_by_angles(points) do
@@ -64,7 +60,7 @@ defmodule SpaceMapP2 do
       {point, org_point}
     end)
     |> Enum.sort()
-    |> Enum.map(fn {angle, points} -> sort_and_remove_temp_points(points) end)
+    |> Enum.map(fn {_angle, points} -> sort_and_remove_temp_points(points) end)
   end
 
   def read_file(path) do
@@ -77,12 +73,12 @@ defmodule SpaceMapP2 do
     end)
   end
 
-  def shoot([], kills) do
-    kills
-  end
-
   def shoot(matrix) do
     shoot(matrix, [])
+  end
+
+  def shoot([], kills) do
+    kills
   end
 
   def shoot(matrix, kills) do

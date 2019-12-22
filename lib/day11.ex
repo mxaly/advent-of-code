@@ -239,11 +239,11 @@ defmodule CPU11 do
   end
 
   def fill_row(row) do
-    [{{x, _}, _} | rest] = row
+    [{{x, _}, _} | _rest] = row
 
     extra =
       if(x > 0) do
-        Enum.map(0..(x - 1), fn i -> {{0, 0}, 0} end)
+        Enum.map(0..(x - 1), fn _ -> {{0, 0}, 0} end)
       else
         []
       end
@@ -252,13 +252,12 @@ defmodule CPU11 do
   end
 
   def draw(path) do
-    pp =
-      path
-      |> Enum.group_by(fn {{x, y}, _} -> y end)
-      |> Enum.map(fn {y, row} -> {y, Enum.sort_by(row, fn {{x, _}, _} -> x end)} end)
-      |> Enum.sort_by(fn {k, _v} -> -k end)
-      |> Enum.map(fn {k, row} -> CPU11.fill_row(row) |> Enum.join(",") end)
-      |> Enum.join("\n")
+    path
+    |> Enum.group_by(fn {{_x, y}, _} -> y end)
+    |> Enum.map(fn {y, row} -> {y, Enum.sort_by(row, fn {{x, _}, _} -> x end)} end)
+    |> Enum.sort_by(fn {k, _v} -> -k end)
+    |> Enum.map(fn {_k, row} -> CPU11.fill_row(row) |> Enum.join(",") end)
+    |> Enum.join("\n")
   end
 
   def run(input) do

@@ -1,6 +1,4 @@
 defmodule ScannerP2 do
-  import IEx
-
   def vel_for_point(x, y, z, points) do
     points
     |> Enum.reduce({0, 0, 0}, fn collision_point, {xa, ya, za} ->
@@ -44,15 +42,14 @@ defmodule ScannerP2 do
     }
   end
 
-  # def step(points, _, 2) do points end
-  def step(points, points, itrs) do
-    itrs
-  end
-
   def step(points) do
     moved = points |> Enum.map(fn point -> calc_point(point, points) end)
 
     step(moved, points, 1)
+  end
+
+  def step(points, points, itrs) do
+    itrs
   end
 
   def step(points, start_points, i) do

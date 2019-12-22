@@ -1,7 +1,6 @@
 defmodule CPU do
   import Enum
   import Map
-  import IEx
 
   defp get_arg(memory, {arg, 2, base}) do
     memory[base + arg] || 0
