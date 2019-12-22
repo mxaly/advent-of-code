@@ -66,5 +66,5 @@ a= [
   1,2,115,119,
   1,119,6,0,
   99,2,0,14,0]
-{x, y} = CPU.determinate(a, 19690720)
-IO.puts(100 * x + y)
+# {x, y} = CPU.determinate(a, 19690720)
+# IO.puts(100 * x + y)

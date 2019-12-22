@@ -1,4 +1,4 @@
-defmodule SpaceMap do
+defmodule SpaceMapP2 do
   import Enum
   import List
   import Map
@@ -66,10 +66,10 @@ defmodule SpaceMap do
 
 end
 
-input =  SpaceMap.read_file("day10.in.txt")
-matrix = input |> SpaceMap.generate_matrix |> SpaceMap.parse_to_map |> SpaceMap.centralize({20, 18}) |> SpaceMap.group_by_angles  |> SpaceMap.shoot |> Enum.reverse
+# input =  SpaceMapP2.read_file("files/day10.in.txt")
+# matrix = input |> SpaceMapP2.generate_matrix |> SpaceMapP2.parse_to_map |> SpaceMapP2.centralize({20, 18}) |> SpaceMapP2.group_by_angles  |> SpaceMapP2.shoot |> Enum.reverse
 
-lines = Enum.with_index(matrix) |> Enum.map(fn {{x,y}, i} -> "#{i}: #{x}, #{y}" end) |> Enum.join("\n")
-IO.puts(lines)
-{x, y} = Enum.at(matrix, 199)
-IO.puts("answer: #{x*100 + y}")
+# lines = Enum.with_index(matrix) |> Enum.map(fn {{x,y}, i} -> "#{i}: #{x}, #{y}" end) |> Enum.join("\n")
+# IO.puts(lines)
+# {x, y} = Enum.at(matrix, 199)
+# IO.puts("answer: #{x*100 + y}")

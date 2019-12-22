@@ -81,8 +81,8 @@ defmodule SpaceMap do
     |> Enum.max_by(fn({point, value}) -> value end)
   end
 end
-SpaceMap.on_line({4,0}, {4,4} ,{4,1})
+# SpaceMap.on_line({4,0}, {4,4} ,{4,1})
 
-input =  SpaceMap.read_file("day10.in.txt")
-matrix = input |> SpaceMap.generate_matrix |> SpaceMap.parse_to_map |> SpaceMap.check_points |> SpaceMap.get_best
+# input =  SpaceMap.read_file("files/day10.in.txt")
+# matrix = input |> SpaceMap.generate_matrix |> SpaceMap.parse_to_map |> SpaceMap.check_points |> SpaceMap.get_best
 

@@ -24,4 +24,4 @@ defmodule Test do
 end
 
 
-Enum.count((382345..843167), fn x -> Test.check(x) end)
+# Enum.count((382345..843167), fn x -> Test.check(x) end)

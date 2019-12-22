@@ -1,4 +1,4 @@
-defmodule Scanner do
+defmodule ScannerP2 do
   import IEx
 
   def vel_for_point(x, y, z, points) do
@@ -81,9 +81,9 @@ defmodule Benchmark do
   end
 end
 
-Benchmark.measure(fn ->
-  Enum.map(0..100, fn _x -> Scanner.step(i2) end)
-end)
+# Benchmark.measure(fn ->
+#   Enum.map(0..100, fn _x -> Scanner.step(i2) end)
+# end)
 
 
 
