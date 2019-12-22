@@ -1,8 +1,8 @@
 defmodule RC do
-  def gcd(a,0), do: abs(a)
-  def gcd(a,b), do: gcd(b, rem(a,b))
+  def gcd(a, 0), do: abs(a)
+  def gcd(a, b), do: gcd(b, rem(a, b))
 
-  def lcm(a,b), do: div(abs(a*b), gcd(a,b))
+  def lcm(a, b), do: div(abs(a * b), gcd(a, b))
 end
 
 defmodule Scanner do
@@ -17,34 +17,42 @@ defmodule Scanner do
         point[axis] > collision_point[axis] -> -1
       end
     end)
-    |> Enum.sum
+    |> Enum.sum()
   end
 
   def add_vel(points, axis) do
     v_axis = String.to_atom("vel_#{axis}")
+
     points
     |> Enum.map(fn point ->
       vel = vel_for_point(point, points, axis) + (point[v_axis] || 0)
+
       point
       |> Map.put(v_axis, vel)
       |> Map.put(axis, point[axis] + vel)
     end)
   end
 
-  def step(points,  0) do points end
+  def step(points, 0) do
+    points
+  end
+
   def step(points, steps) do
-    moved = points
+    moved =
+      points
       |> add_vel(:x)
       |> add_vel(:y)
       |> add_vel(:z)
+
     step(moved, steps)
   end
 
   def step(points, steps) do
-    moved = points
-    |> add_vel(:x)
-    |> add_vel(:y)
-    |> add_vel(:z)
+    moved =
+      points
+      |> add_vel(:x)
+      |> add_vel(:y)
+      |> add_vel(:z)
 
     step(moved, steps - 1)
   end
@@ -69,20 +77,20 @@ defmodule Scanner do
   end
 
   def point_energy(point) do
-    (abs(point[:x]) + abs(point[:y]) + abs(point[:z])) * (abs(point[:vel_x]) + abs(point[:vel_y]) + abs(point[:vel_z]))
+    (abs(point[:x]) + abs(point[:y]) + abs(point[:z])) *
+      (abs(point[:vel_x]) + abs(point[:vel_y]) + abs(point[:vel_z]))
   end
 
   def calc_energy(points) do
     points
     |> Enum.map(&point_energy/1)
-    |> Enum.sum
+    |> Enum.sum()
   end
 
   def energy_after(input, steps) do
     input |> step(steps) |> calc_energy
   end
 end
-
 
 # input = [
 #   %{x: 15, y: -2, z: -6, vel_x: 0, vel_y: 0, vel_z: 0},
@@ -104,8 +112,3 @@ end
 #   %{x: 2, y: -7, z: 3, vel_x: 0, vel_y: 0, vel_z: 0},
 #   %{x: 9, y: -8, z: -3, vel_x: 0, vel_y: 0, vel_z: 0}
 # ]
-
-
-
-
-

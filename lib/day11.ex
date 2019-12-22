@@ -4,16 +4,33 @@ defmodule CPU11 do
   import Map
   import IEx
 
-  defp get_arg(memory, {arg, 2, base}) do memory[base + arg] || 0 end
-  defp get_arg(memory, {arg, 0, _base}) do memory[arg] || 0 end
-  defp get_arg(memory, {arg, nil, _base}) do memory[arg] || 0 end
-  defp get_arg(_, {arg, 1, _base}) do arg end
-  defp get_position({2, arg, base}) do base + arg end
-  defp get_position({_, arg, _} ) do arg end
+  defp get_arg(memory, {arg, 2, base}) do
+    memory[base + arg] || 0
+  end
+
+  defp get_arg(memory, {arg, 0, _base}) do
+    memory[arg] || 0
+  end
+
+  defp get_arg(memory, {arg, nil, _base}) do
+    memory[arg] || 0
+  end
+
+  defp get_arg(_, {arg, 1, _base}) do
+    arg
+  end
+
+  defp get_position({2, arg, base}) do
+    base + arg
+  end
+
+  defp get_position({_, arg, _}) do
+    arg
+  end
 
   defp parse_opp(opp_digits) do
     if(length(opp_digits) > 2) do
-      [code, _  | config] = Enum.reverse(opp_digits)
+      [code, _ | config] = Enum.reverse(opp_digits)
       {code, config}
     else
       {String.to_integer(Enum.join(opp_digits)), []}
@@ -21,18 +38,24 @@ defmodule CPU11 do
   end
 
   defp add(memory, {a, b, position}, config, pointer, base) do
-    memory = memory |> put(
-      get_position({at(config, 2), position, base}),
-      get_arg(memory, {a, at(config, 0), base}) + get_arg(memory, {b, at(config, 1), base})
-    )
+    memory =
+      memory
+      |> put(
+        get_position({at(config, 2), position, base}),
+        get_arg(memory, {a, at(config, 0), base}) + get_arg(memory, {b, at(config, 1), base})
+      )
+
     {memory, pointer + 4}
   end
 
   defp multiply(memory, {a, b, position}, config, pointer, base) do
-    memory = memory |> put(
-      get_position({at(config, 2), position, base}),
-      get_arg(memory, {a, at(config, 0), base}) * get_arg(memory, {b, at(config, 1), base})
-    )
+    memory =
+      memory
+      |> put(
+        get_position({at(config, 2), position, base}),
+        get_arg(memory, {a, at(config, 0), base}) * get_arg(memory, {b, at(config, 1), base})
+      )
+
     {memory, pointer + 4}
   end
 
@@ -65,20 +88,26 @@ defmodule CPU11 do
   end
 
   defp less_than(memory, {a, b, position}, config, pointer, base) do
-    memory = if(get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base})) do
-      memory |> put(get_position({at(config, 2), position, base}), 1)
-    else
-      memory |> put(get_position({at(config, 2), position, base}), 0)
-    end
+    memory =
+      if(get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base})) do
+        memory |> put(get_position({at(config, 2), position, base}), 1)
+      else
+        memory |> put(get_position({at(config, 2), position, base}), 0)
+      end
+
     {memory, pointer + 4}
   end
 
   defp equals(memory, {a, b, position}, config, pointer, base) do
-    memory = if(get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base})) do
-      memory |> put(get_position({at(config, 2), position, base}), 1)
-    else
-      memory |> put(get_position({at(config, 2), position, base}), 0)
-    end
+    memory =
+      if(
+        get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base})
+      ) do
+        memory |> put(get_position({at(config, 2), position, base}), 1)
+      else
+        memory |> put(get_position({at(config, 2), position, base}), 0)
+      end
+
     {memory, pointer + 4}
   end
 
@@ -86,7 +115,11 @@ defmodule CPU11 do
     base + get_arg(memory, {arg, at(config, 0), base})
   end
 
-  def tick({memory}) do tick({memory, 0}, 0, [0]) end # starting from black
+  # starting from black
+  def tick({memory}) do
+    tick({memory, 0}, 0, [0])
+  end
+
   def tick({memory, pointer}, base, args) do
     opp = memory[pointer]
     a = memory[pointer + 1]
@@ -94,18 +127,36 @@ defmodule CPU11 do
     c = memory[pointer + 3]
 
     case(parse_opp(Integer.digits(opp))) do
-      {1, config} -> tick(add(memory, {a, b, c}, config, pointer, base), base, args)
-      {2, config} -> tick(multiply(memory, {a, b, c}, config, pointer, base), base, args)
+      {1, config} ->
+        tick(add(memory, {a, b, c}, config, pointer, base), base, args)
+
+      {2, config} ->
+        tick(multiply(memory, {a, b, c}, config, pointer, base), base, args)
+
       {3, config} ->
         {memory, pointer, args} = save(memory, {a}, config, pointer, base, args)
         tick({memory, pointer}, base, args)
-      {4, config} -> {:out, print(memory, {a}, config, pointer, base), base, args}
-      {5, config} -> tick(jump_if_true(memory, {a, b}, config, pointer, base), base, args)
-      {6, config} -> tick(jump_if_false(memory, {a, b}, config, pointer, base), base, args)
-      {7, config} -> tick(less_than(memory, {a, b, c}, config, pointer, base), base, args)
-      {8, config} -> tick(equals(memory, {a, b, c}, config, pointer, base), base, args)
-      {9, config} -> tick({memory, pointer + 2}, increase_base(memory, {a}, config, base), args)
-      {99, _config} -> {:end, memory}
+
+      {4, config} ->
+        {:out, print(memory, {a}, config, pointer, base), base, args}
+
+      {5, config} ->
+        tick(jump_if_true(memory, {a, b}, config, pointer, base), base, args)
+
+      {6, config} ->
+        tick(jump_if_false(memory, {a, b}, config, pointer, base), base, args)
+
+      {7, config} ->
+        tick(less_than(memory, {a, b, c}, config, pointer, base), base, args)
+
+      {8, config} ->
+        tick(equals(memory, {a, b, c}, config, pointer, base), base, args)
+
+      {9, config} ->
+        tick({memory, pointer + 2}, increase_base(memory, {a}, config, base), args)
+
+      {99, _config} ->
+        {:end, memory}
     end
   end
 
@@ -127,7 +178,6 @@ defmodule CPU11 do
     end
   end
 
-
   def rotate(:down, direction) do
     case direction do
       0 -> :right
@@ -144,47 +194,75 @@ defmodule CPU11 do
 
   def move({x, y}, direction) do
     case direction do
-      :up -> {x, y+1}
-      :down -> {x, y-1}
-      :left -> {x-1, y}
-      :right -> {x+1, y}
+      :up -> {x, y + 1}
+      :down -> {x, y - 1}
+      :left -> {x - 1, y}
+      :right -> {x + 1, y}
     end
   end
 
   def sequence(input) do
-    sequence({input, 0}, {0, [1]}, :up, :paint, %{}, {0,0})
+    sequence({input, 0}, {0, [1]}, :up, :paint, %{}, {0, 0})
   end
+
   def sequence(program, {base, args}, direction, action, path, current_cord) do
     case tick(program, base, args) do
-      {:end, _} -> path
-      {:out, {memory, pointer, out}, base, args} -> case action do
-        :paint ->
-          sequence({memory, pointer}, {base, args}, direction, :move, Map.put(path, current_cord, out), current_cord)
-        :move ->
-          direction = rotate(direction, out)
-          cord = move(current_cord, direction)
-          sequence({memory, pointer}, {base, [get_paint(path, cord)]}, direction, :paint, path, cord)
-      end
+      {:end, _} ->
+        path
+
+      {:out, {memory, pointer, out}, base, args} ->
+        case action do
+          :paint ->
+            sequence(
+              {memory, pointer},
+              {base, args},
+              direction,
+              :move,
+              Map.put(path, current_cord, out),
+              current_cord
+            )
+
+          :move ->
+            direction = rotate(direction, out)
+            cord = move(current_cord, direction)
+
+            sequence(
+              {memory, pointer},
+              {base, [get_paint(path, cord)]},
+              direction,
+              :paint,
+              path,
+              cord
+            )
+        end
     end
   end
 
   def fill_row(row) do
-    [{{x,_},_} | rest] = row
-    extra = if(x > 0) do Enum.map(0..x-1, fn(i) -> {{0, 0}, 0} end) else [] end
-    Enum.map(extra ++ row, fn {{_,_}, c} -> c end)
+    [{{x, _}, _} | rest] = row
+
+    extra =
+      if(x > 0) do
+        Enum.map(0..(x - 1), fn i -> {{0, 0}, 0} end)
+      else
+        []
+      end
+
+    Enum.map(extra ++ row, fn {{_, _}, c} -> c end)
   end
 
   def draw(path) do
-    pp = path
-    |> Enum.group_by(fn({{x, y}, _}) -> y end)
-    |> Enum.map(fn({y, row}) -> {y, Enum.sort_by(row, fn({{x,_},_}) -> x end)} end)
-    |> Enum.sort_by(fn {k, _v} -> -k end)
-    |> Enum.map(fn {k, row} -> CPU11.fill_row(row) |> Enum.join(",") end)
-    |> Enum.join("\n")
+    pp =
+      path
+      |> Enum.group_by(fn {{x, y}, _} -> y end)
+      |> Enum.map(fn {y, row} -> {y, Enum.sort_by(row, fn {{x, _}, _} -> x end)} end)
+      |> Enum.sort_by(fn {k, _v} -> -k end)
+      |> Enum.map(fn {k, row} -> CPU11.fill_row(row) |> Enum.join(",") end)
+      |> Enum.join("\n")
   end
 
   def run(input) do
-    input = input |> Enum.with_index |> Enum.map(fn {el, i} -> {i, el} end) |> Map.new
+    input = input |> Enum.with_index() |> Enum.map(fn {el, i} -> {i, el} end) |> Map.new()
     sequence(input)
   end
 end
@@ -196,4 +274,3 @@ end
 # IO.puts(print)
 
 # pp = path |> Enum.group_by(fn({{x, y}, _}) -> y end) |> Enum.map(fn({y, row}) -> {y, Enum.sort_by(row, fn({{x,_},_}) -> x end)} end) |> Enum.sort_by(fn {k, _v} -> -k end)
-

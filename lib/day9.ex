@@ -2,17 +2,33 @@ defmodule CPU do
   import Enum
   import List
 
-  defp get_arg(memory, {arg, 2, base}) do at(memory, base + arg) end
-  defp get_arg(memory, {arg, 0, _base}) do at(memory, arg) end
-  defp get_arg(memory, {arg, nil, _base}) do at(memory, arg) end
-  defp get_arg(_, {arg, 1, _base}) do arg end
-  defp get_position({2, arg, base}) do base + arg end
-  defp get_position({_, arg, _} ) do arg end
+  defp get_arg(memory, {arg, 2, base}) do
+    at(memory, base + arg)
+  end
 
+  defp get_arg(memory, {arg, 0, _base}) do
+    at(memory, arg)
+  end
+
+  defp get_arg(memory, {arg, nil, _base}) do
+    at(memory, arg)
+  end
+
+  defp get_arg(_, {arg, 1, _base}) do
+    arg
+  end
+
+  defp get_position({2, arg, base}) do
+    base + arg
+  end
+
+  defp get_position({_, arg, _}) do
+    arg
+  end
 
   defp parse_opp(opp_digits) do
     if(length(opp_digits) > 2) do
-      [code, _  | config] = Enum.reverse(opp_digits)
+      [code, _ | config] = Enum.reverse(opp_digits)
       {code, config}
     else
       {String.to_integer(Enum.join(opp_digits)), []}
@@ -20,24 +36,37 @@ defmodule CPU do
   end
 
   defp add(memory, [a, b, position | _rest], config, pointer, base) do
-    memory = memory |> replace_at(
-      get_position({at(config, 2), position, base}),
-      get_arg(memory, {a, at(config, 0), base}) + get_arg(memory, {b, at(config, 1), base})
-    )
+    memory =
+      memory
+      |> replace_at(
+        get_position({at(config, 2), position, base}),
+        get_arg(memory, {a, at(config, 0), base}) + get_arg(memory, {b, at(config, 1), base})
+      )
+
     {memory, pointer + 4}
   end
 
   defp multiply(memory, [a, b, position | _rest], config, pointer, base) do
-    memory = memory |> replace_at(
-      get_position({at(config, 2), position, base}),
-      get_arg(memory, {a, at(config, 0), base}) * get_arg(memory, {b, at(config, 1), base})
-    )
+    memory =
+      memory
+      |> replace_at(
+        get_position({at(config, 2), position, base}),
+        get_arg(memory, {a, at(config, 0), base}) * get_arg(memory, {b, at(config, 1), base})
+      )
+
     {memory, pointer + 4}
   end
 
   defp save(memory, [position | _rest], config, pointer, base) do
     input = IO.gets("provide the input") |> String.replace("\n", "") |> String.to_integer()
-    position = if(at(config, 0) == 2) do position + base else position end
+
+    position =
+      if(at(config, 0) == 2) do
+        position + base
+      else
+        position
+      end
+
     memory = memory |> replace_at(position, input)
     {memory, pointer + 2}
   end
@@ -66,20 +95,26 @@ defmodule CPU do
   end
 
   defp less_than(memory, [a, b, position | _rest], config, pointer, base) do
-    memory = if(get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base})) do
-      memory |> replace_at(get_position({at(config, 2), position, base}), 1)
-    else
-      memory |> replace_at(get_position({at(config, 2), position, base}), 0)
-    end
+    memory =
+      if(get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base})) do
+        memory |> replace_at(get_position({at(config, 2), position, base}), 1)
+      else
+        memory |> replace_at(get_position({at(config, 2), position, base}), 0)
+      end
+
     {memory, pointer + 4}
   end
 
   defp equals(memory, [a, b, position | _rest], config, pointer, base) do
-    memory = if(get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base})) do
-      memory |> replace_at(get_position({at(config, 2), position, base}), 1)
-    else
-      memory |> replace_at(get_position({at(config, 2), position, base}), 0)
-    end
+    memory =
+      if(
+        get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base})
+      ) do
+        memory |> replace_at(get_position({at(config, 2), position, base}), 1)
+      else
+        memory |> replace_at(get_position({at(config, 2), position, base}), 0)
+      end
+
     {memory, pointer + 4}
   end
 
@@ -87,9 +122,13 @@ defmodule CPU do
     base + get_arg(memory, {arg, at(config, 0), base})
   end
 
-  def tick({memory}) do tick({memory, 0}, 0) end
+  def tick({memory}) do
+    tick({memory, 0}, 0)
+  end
+
   def tick({memory, pointer}, base) do
     [opp | code] = slice(memory, pointer..-1)
+
     case(parse_opp(Integer.digits(opp))) do
       {1, config} -> tick(add(memory, code, config, pointer, base), base)
       {2, config} -> tick(multiply(memory, code, config, pointer, base), base)
@@ -109,14 +148,14 @@ defmodule CPU do
   end
 
   def run(input) do
-    {:end, res} = tick({input ++ Enum.map(0..10000, fn(_) -> 0 end)})
+    {:end, res} = tick({input ++ Enum.map(0..10000, fn _ -> 0 end)})
   end
 end
 
 defmodule Benchmark do
   def measure(function) do
     function
-    |> :timer.tc
+    |> :timer.tc()
     |> elem(0)
     |> Kernel./(1_000_000)
   end

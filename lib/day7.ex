@@ -105,17 +105,33 @@ defmodule CPU do
     [opp | code] = slice(memory, pointer..-1)
 
     case(parse_opp(Integer.digits(opp))) do
-      {1, config} -> tick(add(memory, code, config, pointer), ext_args)
-      {2, config} -> tick(multiply(memory, code, config, pointer), ext_args)
+      {1, config} ->
+        tick(add(memory, code, config, pointer), ext_args)
+
+      {2, config} ->
+        tick(multiply(memory, code, config, pointer), ext_args)
+
       {3, _config} ->
         [arg | rest] = ext_args
         tick(save(memory, code, pointer, arg), rest)
-      {4, _config} -> print(memory, code, pointer)
-      {5, config} -> tick(jump_if_true(memory, code, config, pointer), ext_args)
-      {6, config} -> tick(jump_if_false(memory, code, config, pointer), ext_args)
-      {7, config} -> tick(less_than(memory, code, config, pointer), ext_args)
-      {8, config} -> tick(equals(memory, code, config, pointer), ext_args)
-      {99, _config} -> {:end, memory}
+
+      {4, _config} ->
+        print(memory, code, pointer)
+
+      {5, config} ->
+        tick(jump_if_true(memory, code, config, pointer), ext_args)
+
+      {6, config} ->
+        tick(jump_if_false(memory, code, config, pointer), ext_args)
+
+      {7, config} ->
+        tick(less_than(memory, code, config, pointer), ext_args)
+
+      {8, config} ->
+        tick(equals(memory, code, config, pointer), ext_args)
+
+      {99, _config} ->
+        {:end, memory}
     end
   end
 
@@ -128,13 +144,15 @@ defmodule CPU do
   end
 
   def run_sequence(code, sequence) do
-    Enum.reduce(sequence, 0, fn(seq, acc) ->
+    Enum.reduce(sequence, 0, fn seq, acc ->
       run(code, [seq, acc])
     end)
   end
 
   def permutations([]), do: [[]]
-  def permutations(list), do: for elem <- list, rest <- permutations(list--[elem]), do: [elem|rest]
+
+  def permutations(list),
+    do: for(elem <- list, rest <- permutations(list -- [elem]), do: [elem | rest])
 
   def find_best(input) do
   end

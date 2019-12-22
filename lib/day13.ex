@@ -2,16 +2,33 @@ defmodule CPU do
   import Enum
   import Map
 
-  defp get_arg(memory, {arg, 2, base}) do memory[base + arg] || 0 end
-  defp get_arg(memory, {arg, 0, _base}) do memory[arg] || 0 end
-  defp get_arg(memory, {arg, nil, _base}) do memory[arg] || 0 end
-  defp get_arg(_, {arg, 1, _base}) do arg end
-  defp get_position({2, arg, base}) do base + arg end
-  defp get_position({_, arg, _} ) do arg end
+  defp get_arg(memory, {arg, 2, base}) do
+    memory[base + arg] || 0
+  end
+
+  defp get_arg(memory, {arg, 0, _base}) do
+    memory[arg] || 0
+  end
+
+  defp get_arg(memory, {arg, nil, _base}) do
+    memory[arg] || 0
+  end
+
+  defp get_arg(_, {arg, 1, _base}) do
+    arg
+  end
+
+  defp get_position({2, arg, base}) do
+    base + arg
+  end
+
+  defp get_position({_, arg, _}) do
+    arg
+  end
 
   defp parse_opp(opp_digits) do
     if(length(opp_digits) > 2) do
-      [code, _  | config] = Enum.reverse(opp_digits)
+      [code, _ | config] = Enum.reverse(opp_digits)
       {code, config}
     else
       {String.to_integer(Enum.join(opp_digits)), []}
@@ -19,18 +36,24 @@ defmodule CPU do
   end
 
   defp add(memory, {a, b, position}, config, pointer, base) do
-    memory = memory |> put(
-      get_position({at(config, 2), position, base}),
-      get_arg(memory, {a, at(config, 0), base}) + get_arg(memory, {b, at(config, 1), base})
-    )
+    memory =
+      memory
+      |> put(
+        get_position({at(config, 2), position, base}),
+        get_arg(memory, {a, at(config, 0), base}) + get_arg(memory, {b, at(config, 1), base})
+      )
+
     {memory, pointer + 4}
   end
 
   defp multiply(memory, {a, b, position}, config, pointer, base) do
-    memory = memory |> put(
-      get_position({at(config, 2), position, base}),
-      get_arg(memory, {a, at(config, 0), base}) * get_arg(memory, {b, at(config, 1), base})
-    )
+    memory =
+      memory
+      |> put(
+        get_position({at(config, 2), position, base}),
+        get_arg(memory, {a, at(config, 0), base}) * get_arg(memory, {b, at(config, 1), base})
+      )
+
     {memory, pointer + 4}
   end
 
@@ -38,6 +61,7 @@ defmodule CPU do
     case args do
       [] ->
         {:halt, {memory, pointer}}
+
       _ ->
         [input | rest_args] = args
         memory = memory |> put(get_position({at(config, 0), position, base}), input)
@@ -68,20 +92,26 @@ defmodule CPU do
   end
 
   defp less_than(memory, {a, b, position}, config, pointer, base) do
-    memory = if(get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base})) do
-      memory |> put(get_position({at(config, 2), position, base}), 1)
-    else
-      memory |> put(get_position({at(config, 2), position, base}), 0)
-    end
+    memory =
+      if(get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base})) do
+        memory |> put(get_position({at(config, 2), position, base}), 1)
+      else
+        memory |> put(get_position({at(config, 2), position, base}), 0)
+      end
+
     {memory, pointer + 4}
   end
 
   defp equals(memory, {a, b, position}, config, pointer, base) do
-    memory = if(get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base})) do
-      memory |> put(get_position({at(config, 2), position, base}), 1)
-    else
-      memory |> put(get_position({at(config, 2), position, base}), 0)
-    end
+    memory =
+      if(
+        get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base})
+      ) do
+        memory |> put(get_position({at(config, 2), position, base}), 1)
+      else
+        memory |> put(get_position({at(config, 2), position, base}), 0)
+      end
+
     {memory, pointer + 4}
   end
 
@@ -89,7 +119,11 @@ defmodule CPU do
     base + get_arg(memory, {arg, at(config, 0), base})
   end
 
-  def tick({memory}) do tick({memory, 0}, 0, [0]) end # starting from black
+  # starting from black
+  def tick({memory}) do
+    tick({memory, 0}, 0, [0])
+  end
+
   def tick({memory, pointer}, base, args) do
     opp = memory[pointer]
     a = memory[pointer + 1]
@@ -97,67 +131,110 @@ defmodule CPU do
     c = memory[pointer + 3]
 
     case(parse_opp(Integer.digits(opp))) do
-      {1, config} -> tick(add(memory, {a, b, c}, config, pointer, base), base, args)
-      {2, config} -> tick(multiply(memory, {a, b, c}, config, pointer, base), base, args)
+      {1, config} ->
+        tick(add(memory, {a, b, c}, config, pointer, base), base, args)
+
+      {2, config} ->
+        tick(multiply(memory, {a, b, c}, config, pointer, base), base, args)
+
       {3, config} ->
         case save(memory, {a}, config, pointer, base, args) do
           {:halt, program} -> {:get_arg, program, base, args}
           {memory, pointer, args} -> tick({memory, pointer}, base, args)
         end
-      {4, config} -> {:out, print(memory, {a}, config, pointer, base), base, args}
-      {5, config} -> tick(jump_if_true(memory, {a, b}, config, pointer, base), base, args)
-      {6, config} -> tick(jump_if_false(memory, {a, b}, config, pointer, base), base, args)
-      {7, config} -> tick(less_than(memory, {a, b, c}, config, pointer, base), base, args)
-      {8, config} -> tick(equals(memory, {a, b, c}, config, pointer, base), base, args)
-      {9, config} -> tick({memory, pointer + 2}, increase_base(memory, {a}, config, base), args)
-      {99, _config} -> {:end, memory}
+
+      {4, config} ->
+        {:out, print(memory, {a}, config, pointer, base), base, args}
+
+      {5, config} ->
+        tick(jump_if_true(memory, {a, b}, config, pointer, base), base, args)
+
+      {6, config} ->
+        tick(jump_if_false(memory, {a, b}, config, pointer, base), base, args)
+
+      {7, config} ->
+        tick(less_than(memory, {a, b, c}, config, pointer, base), base, args)
+
+      {8, config} ->
+        tick(equals(memory, {a, b, c}, config, pointer, base), base, args)
+
+      {9, config} ->
+        tick({memory, pointer + 2}, increase_base(memory, {a}, config, base), args)
+
+      {99, _config} ->
+        {:end, memory}
     end
   end
-
 
   def sequence(input) do
     sequence({input, 0}, {0, []}, :get_x, %{}, %{})
   end
 
   def sequence(program, {base, args}, action, screen, payload) do
-
     case tick(program, base, args) do
-      {:end, _} -> {screen, payload}
+      {:end, _} ->
+        {screen, payload}
+
       {:get_arg, program, base, args} ->
-        {{ball_x, _}, _} = screen |> Enum.filter(fn {_, v} -> v == 4 end) |> List.first
-        {{paddle_x, _}, _} = screen |> Enum.filter(fn {_, v} -> v == 3 end) |> List.first
-        args = cond do
-          ball_x > paddle_x -> [1]
-          ball_x < paddle_x -> [-1]
-          ball_x == paddle_x -> [0]
-        end
-        sequence(program, {base, args}, action, screen, payload)
-      {:out, {memory, pointer, out}, base, args} -> case action do
-        :get_x ->
-          sequence({memory, pointer}, {base, args}, :get_y, screen, Map.put(payload, :x, out))
-        :get_y ->
-          sequence({memory, pointer}, {base, args}, :get_sign, screen, Map.put(payload, :y, out))
-        :get_sign ->
-          case payload do
-            %{x: -1, y: 0} ->
-              sequence({memory, pointer}, {base, args}, :get_x, screen, Map.put(payload, :score, out))
-            _ ->
-              %{x: x, y: y} = payload
-              screen = Map.put(screen, {x, y}, out)
-              Process.sleep(1)
-              draw_screen(screen)
-              sequence({memory, pointer}, {base, args}, :get_x, screen, payload)
+        {{ball_x, _}, _} = screen |> Enum.filter(fn {_, v} -> v == 4 end) |> List.first()
+        {{paddle_x, _}, _} = screen |> Enum.filter(fn {_, v} -> v == 3 end) |> List.first()
+
+        args =
+          cond do
+            ball_x > paddle_x -> [1]
+            ball_x < paddle_x -> [-1]
+            ball_x == paddle_x -> [0]
           end
-      end
+
+        sequence(program, {base, args}, action, screen, payload)
+
+      {:out, {memory, pointer, out}, base, args} ->
+        case action do
+          :get_x ->
+            sequence({memory, pointer}, {base, args}, :get_y, screen, Map.put(payload, :x, out))
+
+          :get_y ->
+            sequence(
+              {memory, pointer},
+              {base, args},
+              :get_sign,
+              screen,
+              Map.put(payload, :y, out)
+            )
+
+          :get_sign ->
+            case payload do
+              %{x: -1, y: 0} ->
+                sequence(
+                  {memory, pointer},
+                  {base, args},
+                  :get_x,
+                  screen,
+                  Map.put(payload, :score, out)
+                )
+
+              _ ->
+                %{x: x, y: y} = payload
+                screen = Map.put(screen, {x, y}, out)
+                Process.sleep(1)
+                draw_screen(screen)
+                sequence({memory, pointer}, {base, args}, :get_x, screen, payload)
+            end
+        end
     end
   end
 
   def draw_screen(screen) do
-    print = screen
-    |> Enum.group_by(fn {{_, y}, _} -> y end )
-    |> Enum.map(fn {index, line} -> Enum.sort_by(line, fn({{x,_},_}) -> x end)
-    |> Enum.map(fn {{_, _}, v} -> get_char(v) end)
-    |> Enum.join("") end) |> Enum.join("\n")
+    print =
+      screen
+      |> Enum.group_by(fn {{_, y}, _} -> y end)
+      |> Enum.map(fn {index, line} ->
+        Enum.sort_by(line, fn {{x, _}, _} -> x end)
+        |> Enum.map(fn {{_, _}, v} -> get_char(v) end)
+        |> Enum.join("")
+      end)
+      |> Enum.join("\n")
+
     IO.write("\r#{print}")
   end
 
@@ -172,11 +249,11 @@ defmodule CPU do
   end
 
   def calc_blocks(screen) do
-    screen |> Enum.filter(fn %{value: value} -> value == 2 end) |> Enum.count
+    screen |> Enum.filter(fn %{value: value} -> value == 2 end) |> Enum.count()
   end
 
   def run(input) do
-    input = input |> Enum.with_index |> Enum.map(fn {el, i} -> {i, el} end) |> Map.new
+    input = input |> Enum.with_index() |> Enum.map(fn {el, i} -> {i, el} end) |> Map.new()
     sequence(input)
   end
 end
