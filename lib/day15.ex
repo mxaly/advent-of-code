@@ -1,3 +1,22 @@
+defmodule MapPrinter do
+  use Agent
+
+  def start_link(_opts) do
+    Agent.start_link(fn -> %{} end)
+  end
+
+  def get_map(bucket, key) do
+    Agent.get(bucket, &Map.get(&1, key))
+  end
+
+  @doc """
+  Puts the `value` for the given `key` in the `bucket`.
+  """
+  def put(bucket, key, value) do
+    Agent.update(bucket, &Map.put(&1, key, value))
+  end
+end
+
 defmodule Drone do
   import Enum
   import Map
@@ -42,32 +61,24 @@ defmodule Drone do
   end
 
   def step(program, {base, args}, {x, y}, %{arg: direction, x: dx, y: dy}, map, pid) do
-    Process.sleep(50)
     case tick(program, base, [direction]) do
       {:end, _} ->
         map
 
       {:out, {memory, pointer, out}, base, args} ->
         new_cords = {x + dx, y + dy}
-        case out do
+        {map, sign} = case out do
           0 ->
             send(pid, {:put, new_cords, " "})
-            Map.put(map, new_cords, "W")
+            {Map.put(map, new_cords, "W") ,"W"}
           1 ->
             send(pid, {:put, new_cords, "█"})
-            sequence(
-              {memory, pointer},
-              {base, args},
-              new_cords,
-              get_unexplored(map, new_cords),
-              Map.put(map, new_cords, "."),
-              pid
-            )
-
+            {Map.put(map, new_cords, "."), "."}
           2 ->
             send(pid, {:put, new_cords, "o"})
-            Map.put(map, new_cords, "o")
+            {Map.put(map, new_cords, "o"), "o"}
         end
+        {{memory, pointer}, {base, []}, new_cords, map, sign}
     end
   end
 
@@ -77,27 +88,28 @@ defmodule Drone do
     sequence({input, 0}, {0, []}, start_cords, get_unexplored(map, start_cords), map, pid)
   end
 
-  def sequence(_program, _config, _current_point, [], map, _pid) do
-    map
-  end
-
   def sequence(program, config, current_point, directions, map, pid) do
+    Process.sleep(50)
     {x, y} = current_point
     send(pid, {:print})
+    routes = directions |> Enum.map(fn direction -> step(program, config, current_point, direction, map, pid) end)
+    no_moves = routes |> Enum.filter(fn {_, _, _, _, r} -> r != "." end)
 
-    stream = Task.async_stream(directions, fn direction ->
-      step(program, config, current_point, direction, map, pid)
-    end, timeout: 10000000, max_concurrency: 100)
+    moves = routes -- no_moves
+    stream = Task.async_stream(moves, fn({program, config, point, new_map, _}) ->
+      [{point, "."} | sequence(program, config, point, get_unexplored(new_map, point), new_map, pid)]
+    end, timeout: 50000000, max_concurrency: 500)
 
-    Enum.map(stream, fn {:ok, map} -> map end)
+    async = Enum.flat_map(stream, fn {:ok, map} -> map end)
+    async ++ (no_moves |> Enum.map(fn {_, _, point, _, r} -> {point, r} end))
+  end
+
+  def flat_and_merge(map) when is_tuple(map) do
+    [map]
   end
 
   def flat_and_merge(map) when is_list(map) do
     map |> Enum.flat_map(fn(el) -> flat_and_merge(el) end)
-  end
-
-  def flat_and_merge(map) when is_map(map) do
-    map
   end
 
   def surrounded_by_oxygen?({x, y}, map) do
@@ -122,9 +134,8 @@ defmodule Drone do
   def run() do
     {:ok, pid} = start_link
     input = @code |> Enum.with_index() |> Enum.map(fn {el, i} -> {i, el} end) |> Map.new()
-    map = sequence(input, pid)
-    {pid, map}
-    # fill_oxygen(map)
+    map = sequence(input, pid) |> Map.new
+    fill_oxygen(map)
   end
 
   def print(map) do
