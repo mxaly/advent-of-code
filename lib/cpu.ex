@@ -177,9 +177,9 @@ defmodule CPU do
   end
 
   def code_from_file(path) do
-    File.read!(path)
-    |> String.split(:binary.compile_pattern([",", "\n", " "]))
-    |> Enum.filter(fn x -> String.match?(x, ~r/\d+/) end)
-    |> Enum.map(&String.to_integer/1)
+    FileReader.read_numbers(path)
+    |> Enum.with_index()
+    |> Enum.map(fn {el, i} -> {i, el} end)
+    |> Map.new()
   end
 end

@@ -8,21 +8,10 @@ defmodule Day1 do
     result + moduleFuel(result)
   end
 
-  def calcFromFile(path) do
-    File.read!(path)
-    |> String.split("\n")
-    |> Enum.filter(fn x ->
-      if(x != "") do
-        x
-      end
-    end)
-    |> Enum.map(&String.to_integer/1)
+  def run() do
+    FileReader.read_numbers("lib/day_1/input.txt")
     |> Enum.map(&moduleFuel/1)
     |> Enum.sum()
     |> round
-  end
-
-  def run() do
-    calcFromFile("lib/day_1/input.txt")
   end
 end

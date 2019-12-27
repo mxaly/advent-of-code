@@ -165,11 +165,12 @@ defmodule Drone do
   end
 
   def run() do
-    code = CPU.code_from_file("files/day15.txt")
     {:ok, pid} = start_link
-    input = code |> Enum.with_index() |> Enum.map(fn {el, i} -> {i, el} end) |> Map.new()
-    map = sequence(input, pid) |> Map.new()
-    fill_oxygen(map, pid)
+
+    CPU.code_from_file("files/day15.txt")
+    |> sequence(pid)
+    |> Map.new()
+    |> fill_oxygen(pid)
   end
 
   def print(map) do
