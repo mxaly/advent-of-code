@@ -1,11 +1,11 @@
-defmodule Test do
+defmodule Day1 do
   def moduleFuel(n) when n / 3 - 2 < 1 do
     0
   end
 
   def moduleFuel(n) do
     result = Float.floor(n / 3 - 2)
-    result + Test.moduleFuel(result)
+    result + moduleFuel(result)
   end
 
   def calcFromFile(path) do
@@ -17,11 +17,12 @@ defmodule Test do
       end
     end)
     |> Enum.map(&String.to_integer/1)
-    |> Enum.map(&Test.moduleFuel/1)
+    |> Enum.map(&moduleFuel/1)
     |> Enum.sum()
     |> round
   end
-end
 
-# Test.calcFromFile("/Users/rafal/input.txt")
-Test.moduleFuel(1969)
+  def run() do
+    calcFromFile("lib/day_1/input.txt")
+  end
+end
