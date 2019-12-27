@@ -146,7 +146,7 @@ defmodule CPU do
       {3, config} ->
         case save(memory, {a}, config, pointer, base, args) do
           {:halt, program} ->
-            {:get_arg, program, base, args}
+            {:get_arg, %CPU{memory: memory, pointer: pointer, base: base, args: args}}
 
           {memory, pointer, args} ->
             tick({memory, pointer}, base, args)
