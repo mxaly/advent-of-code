@@ -2,6 +2,8 @@ defmodule CPU do
   import Enum
   import Map
 
+  defstruct memory: %{}, pointer: 0, base: 0, args: []
+
   defp get_arg(memory, {arg, 2, base}) do
     memory[base + arg] || 0
   end
@@ -69,12 +71,12 @@ defmodule CPU do
     end
   end
 
-  def print(memory, {position}, config, pointer, base) do
+  defp print(memory, {position}, config, pointer, base) do
     # IO.puts("diagnostics: #{get_arg(memory, {position, at(config, 0), base})}")
     {memory, pointer + 2, get_arg(memory, {position, at(config, 0), base})}
   end
 
-  def jump_if_true(memory, {read, position}, config, pointer, base) do
+  defp jump_if_true(memory, {read, position}, config, pointer, base) do
     if get_arg(memory, {read, at(config, 0), base}) != 0 do
       {memory, get_arg(memory, {position, at(config, 1), base})}
     else
@@ -82,7 +84,7 @@ defmodule CPU do
     end
   end
 
-  def jump_if_false(memory, {read, position}, config, pointer, base) do
+  defp jump_if_false(memory, {read, position}, config, pointer, base) do
     if get_arg(memory, {read, at(config, 0), base}) == 0 do
       {memory, get_arg(memory, {position, at(config, 1), base})}
       # {memory, position}
@@ -121,10 +123,14 @@ defmodule CPU do
 
   # starting from black
   def tick({memory}) do
-    tick({memory, 0}, 0, [0])
+    tick(%CPU{memory: memory})
   end
 
   def tick({memory, pointer}, base, args) do
+    tick(%CPU{memory: memory, pointer: pointer, base: base, args: args})
+  end
+
+  def tick(cpu = %CPU{memory: memory, pointer: pointer, base: base, args: args}) do
     opp = memory[pointer]
     a = memory[pointer + 1]
     b = memory[pointer + 2]
@@ -139,12 +145,16 @@ defmodule CPU do
 
       {3, config} ->
         case save(memory, {a}, config, pointer, base, args) do
-          {:halt, program} -> {:get_arg, program, base, args}
-          {memory, pointer, args} -> tick({memory, pointer}, base, args)
+          {:halt, program} ->
+            {:get_arg, program, base, args}
+
+          {memory, pointer, args} ->
+            tick({memory, pointer}, base, args)
         end
 
       {4, config} ->
-        {:out, print(memory, {a}, config, pointer, base), base, args}
+        {memory, pointer, value} = print(memory, {a}, config, pointer, base)
+        {:out, %CPU{memory: memory, pointer: pointer, base: base, args: args}, value}
 
       {5, config} ->
         tick(jump_if_true(memory, {a, b}, config, pointer, base), base, args)
@@ -164,5 +174,12 @@ defmodule CPU do
       {99, _config} ->
         {:end, memory}
     end
+  end
+
+  def code_from_file(path) do
+    File.read!(path)
+    |> String.split(:binary.compile_pattern([",", "\n", " "]))
+    |> Enum.filter(fn x -> String.match?(x, ~r/\d+/) end)
+    |> Enum.map(&String.to_integer/1)
   end
 end
