@@ -1,4 +1,4 @@
-defmodule FilesReader do
+defmodule Day8 do
   def prepare_structure(input, x, y) do
     input
     |> Enum.chunk_every(x * y)
@@ -42,9 +42,12 @@ defmodule FilesReader do
     merge(rest)
   end
 
-  def run(path) do
+  def parse_to_char(1), do: "█"
+  def parse_to_char(0), do: " "
+
+  def run do
     layers =
-      parse_file(path)
+      parse_file("lib/day_8/input.txt")
       |> prepare_structure(25, 6)
 
     [top | rest] = layers
@@ -53,11 +56,9 @@ defmodule FilesReader do
     |> Enum.with_index()
     |> Enum.map(fn {el, index} -> [el | Enum.map(rest, fn layer -> Enum.at(layer, index) end)] end)
     |> Enum.map(&merge/1)
+    |> Enum.map(&parse_to_char/1)
     |> Enum.chunk_every(25)
-    |> Enum.map(fn x -> Enum.join(x, ",") end)
+    |> Enum.map(fn x -> Enum.join(x, "") end)
     |> Enum.join("\n")
-    |> IO.puts()
   end
 end
-
-# Test.run("day8-input.txt")
