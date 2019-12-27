@@ -1,9 +1,7 @@
 defmodule Day2 do
   import Enum
   import Map
-  import IO
   import CPU
-  import IEx
 
   def restore(memory, x, y) do
     memory |> put(1, x) |> put(2, y)
