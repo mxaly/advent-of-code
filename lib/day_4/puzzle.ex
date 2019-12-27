@@ -21,6 +21,8 @@ defmodule Day4 do
   def check(x) do
     increasing?(x) && groups_valid?(x)
   end
-end
 
-# Enum.count((382345..843167), fn x -> Test.check(x) end)
+  def run() do
+    Enum.count(382_345..843_167, fn x -> check(x) end)
+  end
+end
