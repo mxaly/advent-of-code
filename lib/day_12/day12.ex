@@ -98,17 +98,3 @@ defmodule Scanner do
     find_cycle_length(@input)
   end
 end
-
-# i2 = [
-#   %{x: -1, y: 0, z: 2, vel_x: 0, vel_y: 0, vel_z: 0},
-#   %{x: 2, y: -10, z: -7, vel_x: 0, vel_y: 0, vel_z: 0},
-#   %{x: 4, y: -8, z: 8, vel_x: 0, vel_y: 0, vel_z: 0},
-#   %{x: 3, y: 5, z: -1, vel_x: 0, vel_y: 0, vel_z: 0}
-# ]
-
-# i3 = [
-#   %{x: -8, y: -10, z: 0, vel_x: 0, vel_y: 0, vel_z: 0},
-#   %{x: 5, y: 5, z: 10, vel_x: 0, vel_y: 0, vel_z: 0},
-#   %{x: 2, y: -7, z: 3, vel_x: 0, vel_y: 0, vel_z: 0},
-#   %{x: 9, y: -8, z: -3, vel_x: 0, vel_y: 0, vel_z: 0}
-# ]
