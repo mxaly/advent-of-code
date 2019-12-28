@@ -1,26 +1,6 @@
-defmodule MapPrinter do
+defmodule Day15 do
   @moduledoc false
-  use Agent
-
-  def start_link(_opts) do
-    Agent.start_link(fn -> %{} end)
-  end
-
-  def get_map(bucket, key) do
-    Agent.get(bucket, &Map.get(&1, key))
-  end
-
-  def put(bucket, key, value) do
-    Agent.update(bucket, &Map.put(&1, key, value))
-  end
-end
-
-defmodule Drone do
-  @moduledoc false
-  import Enum
-  import Map
   import CPU
-  import IEx
 
   @directions [
     %{arg: 1, x: 0, y: 1},
@@ -30,29 +10,6 @@ defmodule Drone do
   ]
 
   # def get_unexplored(screen, {x, y}) do get_unexplored(screen, {x, y}, []) end
-
-  def start_link do
-    Task.start_link(fn -> loop(%{}) end)
-  end
-
-  defp loop(map) do
-    receive do
-      {:get_map, caller} ->
-        # send(caller, map)
-        loop(map)
-
-      {:put, key, value} ->
-        loop(Map.put(map, key, value))
-
-      {:print} ->
-        if Map.keys(map) |> length > 1 do
-          printable = print(map)
-          # IO.puts("\r\n\n\n\n\n\n#{printable}")
-        end
-
-        loop(map)
-    end
-  end
 
   def get_unexplored(map, {x, y}) do
     @directions
@@ -75,15 +32,15 @@ defmodule Drone do
         {map, sign} =
           case value do
             0 ->
-              send(pid, {:put, new_cords, "+"})
+              send(pid, {:put_pixel, new_cords, "+"})
               {Map.put(map, new_cords, "W"), "W"}
 
             1 ->
-              send(pid, {:put, new_cords, "█"})
+              send(pid, {:put_pixel, new_cords, "█"})
               {Map.put(map, new_cords, "."), "."}
 
             2 ->
-              send(pid, {:put, new_cords, "o"})
+              send(pid, {:put_pixel, new_cords, "o"})
               {Map.put(map, new_cords, "o"), "o"}
           end
 
@@ -101,7 +58,7 @@ defmodule Drone do
     # Process.sleep(50)
 
     {x, y} = current_point
-    send(pid, {:print})
+    # send(pid, {:print})
 
     directions
     |> Task.async_stream(fn direction ->
@@ -144,14 +101,14 @@ defmodule Drone do
   end
 
   def fill_oxygen(map, pid, hours) do
-    send(pid, {:print})
+    # send(pid, {:print})
     # Process.sleep(50)
 
     new_map =
       Map.keys(map)
       |> Enum.reduce(map, fn cords, m ->
         if map[cords] == "." && surrounded_by_oxygen?(cords, map) do
-          send(pid, {:put, cords, "░"})
+          send(pid, {:put_pixel, cords, "░"})
           Map.put(m, cords, "o")
         else
           m
@@ -161,29 +118,20 @@ defmodule Drone do
     if Enum.find_value(new_map, fn {_k, value} -> value == "." end) do
       fill_oxygen(new_map |> Map.new(), pid, hours + 1)
     else
-      send(pid, {:print})
+      # send(pid, {:print})
       {map |> Map.new(), hours}
     end
   end
 
   def run() do
-    {:ok, pid} = start_link
+    {:ok, pid} = Screen.start_link()
 
-    CPU.code_from_file("files/day15.txt")
-    |> sequence(pid)
-    |> Map.new()
-    |> fill_oxygen(pid)
-  end
+    {map, hours} =
+      CPU.code_from_file("files/day15.txt")
+      |> sequence(pid)
+      |> Map.new()
+      |> fill_oxygen(pid)
 
-  def print(map) do
-    min_x = Map.keys(map) |> Enum.map(fn {x, y} -> x end) |> Enum.min()
-    max_x = Map.keys(map) |> Enum.map(fn {x, y} -> x end) |> Enum.max()
-    min_y = Map.keys(map) |> Enum.map(fn {x, y} -> y end) |> Enum.min()
-    max_y = Map.keys(map) |> Enum.map(fn {x, y} -> y end) |> Enum.max()
-
-    Enum.map(min_y..(min_y + 40), fn y ->
-      Enum.map((min_x - 10)..max_x, fn x -> map[{x, y}] || " " end) |> Enum.join()
-    end)
-    |> Enum.join("\n")
+    hours
   end
 end
