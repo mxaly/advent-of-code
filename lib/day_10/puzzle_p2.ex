@@ -1,4 +1,4 @@
-defmodule SpaceMapP2 do
+defmodule Day10P2 do
   @moduledoc false
   import Enum
 
@@ -28,7 +28,7 @@ defmodule SpaceMapP2 do
   def parse_to_map(matrix) do
     Enum.flat_map(matrix, fn {line, y} ->
       line
-      |> Enum.map(, fn {sign, x} -> if sign == "#", do: {x, y} end)
+      |> Enum.map(fn {sign, x} -> if sign == "#", do: {x, y} end)
       |> Enum.reject(&is_nil/1)
     end)
   end
@@ -80,6 +80,26 @@ defmodule SpaceMapP2 do
     else
       shoot(rest ++ [rest_line], kills)
     end
+  end
+
+  def run do
+    matrix =
+      read_file("files/day10.in.txt")
+      |> generate_matrix
+      |> parse_to_map
+      |> centralize({20, 18})
+      |> group_by_angles
+      |> shoot
+      |> Enum.reverse()
+
+    # lines = matrix 
+    # |> Enum.with_index() 
+    # |> Enum.map(fn {{x,y}, i} -> "#{i}: #{x}, #{y}" end) 
+    # |> Enum.join("\n")
+    # IO.puts(lines)
+
+    {x, y} = Enum.at(matrix, 199)
+    x * 100 + y
   end
 end
 
