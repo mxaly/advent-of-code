@@ -1,4 +1,5 @@
 defmodule MapPrinter do
+  @moduledoc false
   use Agent
 
   def start_link(_opts) do
@@ -15,6 +16,7 @@ defmodule MapPrinter do
 end
 
 defmodule Drone do
+  @moduledoc false
   import Enum
   import Map
   import CPU
@@ -43,7 +45,7 @@ defmodule Drone do
         loop(Map.put(map, key, value))
 
       {:print} ->
-        if(Map.keys(map) |> length > 1) do
+        if Map.keys(map) |> length > 1 do
           printable = print(map)
           # IO.puts("\r\n\n\n\n\n\n#{printable}")
         end
@@ -108,7 +110,7 @@ defmodule Drone do
     |> Enum.map(fn {:ok, route} -> route end)
     |> Task.async_stream(
       fn {cpu, point, new_map, sign} ->
-        if(sign == ".") do
+        if sign == "." do
           [
             {point, "."}
             | sequence(cpu, point, get_unexplored(new_map, point), new_map, pid)
@@ -148,7 +150,7 @@ defmodule Drone do
     new_map =
       Map.keys(map)
       |> Enum.reduce(map, fn cords, m ->
-        if(map[cords] == "." && surrounded_by_oxygen?(cords, map)) do
+        if map[cords] == "." && surrounded_by_oxygen?(cords, map) do
           send(pid, {:put, cords, "░"})
           Map.put(m, cords, "o")
         else
@@ -156,7 +158,7 @@ defmodule Drone do
         end
       end)
 
-    if(Enum.find_value(new_map, fn {_k, value} -> value == "." end)) do
+    if Enum.find_value(new_map, fn {_k, value} -> value == "." end) do
       fill_oxygen(new_map |> Map.new(), pid, hours + 1)
     else
       send(pid, {:print})

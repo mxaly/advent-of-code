@@ -1,4 +1,5 @@
 defmodule FileReader do
+  @moduledoc false
   def read_numbers(path) do
     File.read!(path)
     |> String.split(:binary.compile_pattern([",", "\n", " "]))

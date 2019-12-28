@@ -1,4 +1,5 @@
 defmodule Day13 do
+  @moduledoc false
   import Enum
   import Map
 
@@ -27,7 +28,7 @@ defmodule Day13 do
   end
 
   defp parse_opp(opp_digits) do
-    if(length(opp_digits) > 2) do
+    if length(opp_digits) > 2 do
       [code, _ | config] = Enum.reverse(opp_digits)
       {code, config}
     else
@@ -93,7 +94,7 @@ defmodule Day13 do
 
   defp less_than(memory, {a, b, position}, config, pointer, base) do
     memory =
-      if(get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base})) do
+      if get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base}) do
         memory |> put(get_position({at(config, 2), position, base}), 1)
       else
         memory |> put(get_position({at(config, 2), position, base}), 0)
@@ -104,9 +105,7 @@ defmodule Day13 do
 
   defp equals(memory, {a, b, position}, config, pointer, base) do
     memory =
-      if(
-        get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base})
-      ) do
+      if get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base}) do
         memory |> put(get_position({at(config, 2), position, base}), 1)
       else
         memory |> put(get_position({at(config, 2), position, base}), 0)
@@ -124,6 +123,7 @@ defmodule Day13 do
     tick({memory, 0}, 0, [0])
   end
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def tick({memory, pointer}, base, args) do
     opp = memory[pointer]
     a = memory[pointer + 1]
@@ -202,6 +202,7 @@ defmodule Day13 do
               Map.put(payload, :y, out)
             )
 
+          # credo:disable-for-lines:20 Elixir.Credo.Check.Refactor.Nesting
           :get_sign ->
             case payload do
               %{x: -1, y: 0} ->

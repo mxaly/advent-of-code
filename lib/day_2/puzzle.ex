@@ -1,4 +1,6 @@
 defmodule Day2 do
+  @moduledoc false
+
   import Enum
   import Map
   import CPU
@@ -12,6 +14,7 @@ defmodule Day2 do
     head
   end
 
+  # credo:disable-for-lines:8 Elixir.Credo.Check.Refactor.Nesting
   def determinate(input, goal) do
     reduce_while(0..99, 0, fn x, _acc ->
       reduce_while(0..99, 0, fn y, _acc ->

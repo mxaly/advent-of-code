@@ -1,4 +1,5 @@
 defmodule Day11 do
+  @moduledoc false
   import Enum
   import List
   import Map
@@ -29,7 +30,7 @@ defmodule Day11 do
   end
 
   defp parse_opp(opp_digits) do
-    if(length(opp_digits) > 2) do
+    if length(opp_digits) > 2 do
       [code, _ | config] = Enum.reverse(opp_digits)
       {code, config}
     else
@@ -89,7 +90,7 @@ defmodule Day11 do
 
   defp less_than(memory, {a, b, position}, config, pointer, base) do
     memory =
-      if(get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base})) do
+      if get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base}) do
         memory |> put(get_position({at(config, 2), position, base}), 1)
       else
         memory |> put(get_position({at(config, 2), position, base}), 0)
@@ -100,9 +101,7 @@ defmodule Day11 do
 
   defp equals(memory, {a, b, position}, config, pointer, base) do
     memory =
-      if(
-        get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base})
-      ) do
+      if get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base}) do
         memory |> put(get_position({at(config, 2), position, base}), 1)
       else
         memory |> put(get_position({at(config, 2), position, base}), 0)
@@ -120,6 +119,7 @@ defmodule Day11 do
     tick({memory, 0}, 0, [0])
   end
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def tick({memory, pointer}, base, args) do
     opp = memory[pointer]
     a = memory[pointer + 1]
@@ -242,7 +242,7 @@ defmodule Day11 do
     [{{x, _}, _} | _rest] = row
 
     extra =
-      if(x > 0) do
+      if x > 0 do
         Enum.map(0..(x - 1), fn _ -> {{0, 0}, 0} end)
       else
         []

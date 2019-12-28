@@ -1,4 +1,5 @@
 defmodule Day5 do
+  @moduledoc false
   import Enum
   import List
   import CPU

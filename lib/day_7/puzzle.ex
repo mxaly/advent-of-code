@@ -1,4 +1,5 @@
 defmodule Day7 do
+  @moduledoc false
   import CPU
 
   def loop(sequence, cpus, input) do

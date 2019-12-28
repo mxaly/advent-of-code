@@ -1,9 +1,10 @@
 defmodule SpaceMap do
+  @moduledoc false
   import Map
 
   def line_formula({x1, y1}, {x2, y2}, x) do
     m =
-      if(x2 == x1) do
+      if x2 == x1 do
         1
       else
         y2 - y1 / x2 - x1
@@ -22,7 +23,7 @@ defmodule SpaceMap do
     on_line = dxc * dyl - dyc * dxl == 0
 
     on_line &&
-      if(abs(dxl) >= abs(dyl)) do
+      if abs(dxl) >= abs(dyl) do
         Enum.member?(x1..x2, cx)
       else
         Enum.member?(y1..y2, cy)
@@ -33,11 +34,7 @@ defmodule SpaceMap do
     input
     |> Enum.map(fn line ->
       String.split(line, "")
-      |> Enum.filter(fn x ->
-        if(x != "") do
-          x
-        end
-      end)
+      |> Enum.filter(fn x -> x != "" end)
     end)
     |> Enum.map(&Enum.with_index/1)
     |> Enum.with_index()
@@ -47,11 +44,7 @@ defmodule SpaceMap do
     matrix
     |> Enum.reduce(%{}, fn {line, y}, map ->
       Enum.reduce(line, map, fn {sign, x}, map ->
-        if sign == "#" do
-          put(map, {x, y}, {x, y})
-        else
-          map
-        end
+        if sign == "#", do: put(map, {x, y}, {x, y}), else: map
       end)
     end)
   end
@@ -66,11 +59,7 @@ defmodule SpaceMap do
   def read_file(path) do
     File.read!(path)
     |> String.split("\n")
-    |> Enum.filter(fn x ->
-      if(x != "") do
-        x
-      end
-    end)
+    |> Enum.filter(fn x -> x != "" end)
   end
 
   def check_line(map, start_point, end_point) do
@@ -88,7 +77,7 @@ defmodule SpaceMap do
     |> Enum.map(fn start_point ->
       {start_point,
        Enum.reduce(Map.values(matrix), 0, fn end_point, acc ->
-         if(start_point != end_point && check_line(matrix, start_point, end_point)) do
+         if start_point != end_point && check_line(matrix, start_point, end_point) do
            acc + 1
          else
            acc

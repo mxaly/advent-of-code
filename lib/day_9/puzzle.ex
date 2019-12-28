@@ -1,6 +1,6 @@
 defmodule Day9 do
+  @moduledoc false
   import CPU
-  import IEx
 
   def loop(cpu) do
     case tick(cpu) do

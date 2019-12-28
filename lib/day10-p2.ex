@@ -1,4 +1,5 @@
 defmodule SpaceMapP2 do
+  @moduledoc false
   import Enum
 
   def angle_between_points({x1, y1}, {x2, y2}, {x3, y3}) do
@@ -7,7 +8,7 @@ defmodule SpaceMapP2 do
     c = :math.pow(x3 - x1, 2) + :math.pow(y3 - y1, 2)
     angle = Float.round(:math.acos((a + b - c) / :math.sqrt(4 * a * b)) * 180 / :math.pi(), 4)
 
-    if(x3 < 0) do
+    if x3 < 0 do
       angle * -1 + 360
     else
       angle
@@ -18,11 +19,7 @@ defmodule SpaceMapP2 do
     input
     |> Enum.map(fn line ->
       String.split(line, "")
-      |> Enum.filter(fn x ->
-        if(x != "") do
-          x
-        end
-      end)
+      |> Enum.filter(fn x -> x != "" end)
     end)
     |> Enum.map(&Enum.with_index/1)
     |> Enum.with_index()
@@ -30,11 +27,8 @@ defmodule SpaceMapP2 do
 
   def parse_to_map(matrix) do
     Enum.flat_map(matrix, fn {line, y} ->
-      Enum.map(line, fn {sign, x} ->
-        if sign == "#" do
-          {x, y}
-        end
-      end)
+      line
+      |> Enum.map(, fn {sign, x} -> if sign == "#", do: {x, y} end)
       |> Enum.reject(&is_nil/1)
     end)
   end
@@ -66,11 +60,7 @@ defmodule SpaceMapP2 do
   def read_file(path) do
     File.read!(path)
     |> String.split("\n")
-    |> Enum.filter(fn x ->
-      if(x != "") do
-        x
-      end
-    end)
+    |> Enum.filter(fn x -> x != "" end)
   end
 
   def shoot(matrix) do
@@ -85,7 +75,7 @@ defmodule SpaceMapP2 do
     [[target | rest_line] | rest] = matrix
     kills = [target | kills]
 
-    if(empty?(rest_line)) do
+    if empty?(rest_line) do
       shoot(rest, kills)
     else
       shoot(rest ++ [rest_line], kills)

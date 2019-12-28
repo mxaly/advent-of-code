@@ -1,4 +1,5 @@
 defmodule Day4 do
+  @moduledoc false
   defp get_groups(number) do
     number
     |> Integer.to_string()

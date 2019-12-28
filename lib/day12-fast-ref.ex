@@ -1,4 +1,7 @@
 defmodule ScannerP2 do
+  @moduledoc false
+
+  # cred:disable-for-lines:22 
   def vel_for_point(x, y, z, points) do
     points
     |> Enum.reduce({0, 0, 0}, fn collision_point, {xa, ya, za} ->

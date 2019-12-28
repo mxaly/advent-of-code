@@ -1,4 +1,6 @@
 defmodule Day3 do
+  @moduledoc false
+
   def get_path(path, []) do
     path
   end
@@ -45,7 +47,7 @@ defmodule Day3 do
     crosses = get_crosses(path1, path2)
 
     # # closes crossing distance
-    Enum.map(crosses, fn {x, y} -> abs(x) + abs(y) end)
+    # Enum.map(crosses, fn {x, y} -> abs(x) + abs(y) end)
 
     # # closes crossing steps
     crosses

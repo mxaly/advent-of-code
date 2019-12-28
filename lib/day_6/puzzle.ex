@@ -1,4 +1,5 @@
 defmodule Day6 do
+  @moduledoc false
   import IEx
 
   def prepare_structure(lines) do

@@ -1,4 +1,5 @@
 defmodule Day8 do
+  @moduledoc false
   def prepare_structure(input, x, y) do
     input
     |> Enum.chunk_every(x * y)

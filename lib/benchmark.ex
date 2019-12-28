@@ -1,4 +1,5 @@
 defmodule Benchmark do
+  @moduledoc false
   def measure(function) do
     function
     |> :timer.tc()

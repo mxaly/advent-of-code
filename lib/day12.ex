@@ -1,4 +1,5 @@
 defmodule RC do
+  @moduledoc false
   def gcd(a, 0), do: abs(a)
   def gcd(a, b), do: gcd(b, rem(a, b))
 
@@ -6,6 +7,7 @@ defmodule RC do
 end
 
 defmodule Scanner do
+  @moduledoc false
   import IEx
 
   def vel_for_point(point, points, axis) do

@@ -1,4 +1,5 @@
 defmodule CPU do
+  @moduledoc false
   import Enum
   import Map
 
@@ -29,7 +30,7 @@ defmodule CPU do
   end
 
   defp parse_opp(opp_digits) do
-    if(length(opp_digits) > 2) do
+    if length(opp_digits) > 2 do
       [code, _ | config] = Enum.reverse(opp_digits)
       {code, config}
     else
@@ -95,7 +96,7 @@ defmodule CPU do
 
   defp less_than(memory, {a, b, position}, config, pointer, base) do
     memory =
-      if(get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base})) do
+      if get_arg(memory, {a, at(config, 0), base}) < get_arg(memory, {b, at(config, 1), base}) do
         memory |> put(get_position({at(config, 2), position, base}), 1)
       else
         memory |> put(get_position({at(config, 2), position, base}), 0)
@@ -106,9 +107,7 @@ defmodule CPU do
 
   defp equals(memory, {a, b, position}, config, pointer, base) do
     memory =
-      if(
-        get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base})
-      ) do
+      if get_arg(memory, {a, at(config, 0), base}) == get_arg(memory, {b, at(config, 1), base}) do
         memory |> put(get_position({at(config, 2), position, base}), 1)
       else
         memory |> put(get_position({at(config, 2), position, base}), 0)
@@ -130,6 +129,7 @@ defmodule CPU do
     tick(%CPU{memory: memory, pointer: pointer, base: base, args: args})
   end
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def tick(cpu = %CPU{memory: memory, pointer: pointer, base: base, args: args}) do
     opp = memory[pointer]
     a = memory[pointer + 1]
