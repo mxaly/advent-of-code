@@ -1,5 +1,6 @@
 defmodule RC do
   @moduledoc false
+
   def gcd(a, 0), do: abs(a)
   def gcd(a, b), do: gcd(b, rem(a, b))
 
@@ -8,7 +9,13 @@ end
 
 defmodule Scanner do
   @moduledoc false
-  import IEx
+
+  @input [
+    %{x: 15, y: -2, z: -6, vel_x: 0, vel_y: 0, vel_z: 0},
+    %{x: -5, y: -4, z: -11, vel_x: 0, vel_y: 0, vel_z: 0},
+    %{x: 0, y: -6, z: 0, vel_x: 0, vel_y: 0, vel_z: 0},
+    %{x: 5, y: 9, z: 6, vel_x: 0, vel_y: 0, vel_z: 0}
+  ]
 
   def vel_for_point(point, points, axis) do
     points
@@ -46,16 +53,6 @@ defmodule Scanner do
       |> add_vel(:y)
       |> add_vel(:z)
 
-    step(moved, steps)
-  end
-
-  def step(points, steps) do
-    moved =
-      points
-      |> add_vel(:x)
-      |> add_vel(:y)
-      |> add_vel(:z)
-
     step(moved, steps - 1)
   end
 
@@ -72,9 +69,9 @@ defmodule Scanner do
   end
 
   def find_cycle_length(input) do
-    sx = Scanner.axis_step(input, :x)
-    sy = Scanner.axis_step(input, :y)
-    sz = Scanner.axis_step(input, :z)
+    sx = axis_step(input, :x)
+    sy = axis_step(input, :y)
+    sz = axis_step(input, :z)
     sx |> RC.lcm(sy) |> RC.lcm(sz)
   end
 
@@ -92,14 +89,15 @@ defmodule Scanner do
   def energy_after(input, steps) do
     input |> step(steps) |> calc_energy
   end
-end
 
-# input = [
-#   %{x: 15, y: -2, z: -6, vel_x: 0, vel_y: 0, vel_z: 0},
-#   %{x: -5, y: -4, z: -11, vel_x: 0, vel_y: 0, vel_z: 0},
-#   %{x: 0, y: -6, z: 0, vel_x: 0, vel_y: 0, vel_z: 0},
-#   %{x: 5, y: 9, z: 6, vel_x: 0, vel_y: 0, vel_z: 0}
-# ]
+  def run_p1 do
+    energy_after(@input, 1000)
+  end
+
+  def run_p2 do
+    find_cycle_length(@input)
+  end
+end
 
 # i2 = [
 #   %{x: -1, y: 0, z: 2, vel_x: 0, vel_y: 0, vel_z: 0},
