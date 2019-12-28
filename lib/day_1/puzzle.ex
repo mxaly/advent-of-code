@@ -10,7 +10,7 @@ defmodule Day1 do
     result + module_fuel(result)
   end
 
-  def run() do
+  def run do
     FileReader.read_numbers("lib/day_1/input.txt")
     |> Enum.map(&module_fuel/1)
     |> Enum.sum()

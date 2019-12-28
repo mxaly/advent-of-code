@@ -130,7 +130,7 @@ defmodule CPU do
   end
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
-  def tick(cpu = %CPU{memory: memory, pointer: pointer, base: base, args: args}) do
+  def tick(%CPU{memory: memory, pointer: pointer, base: base, args: args}) do
     opp = memory[pointer]
     a = memory[pointer + 1]
     b = memory[pointer + 2]
@@ -145,7 +145,7 @@ defmodule CPU do
 
       {3, config} ->
         case save(memory, {a}, config, pointer, base, args) do
-          {:halt, program} ->
+          {:halt, {memory, pointer}} ->
             {:get_arg, %CPU{memory: memory, pointer: pointer, base: base, args: args}}
 
           {memory, pointer, args} ->
