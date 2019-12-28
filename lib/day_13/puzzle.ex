@@ -170,6 +170,7 @@ defmodule Day13 do
     sequence({input, 0}, {0, []}, :get_x, %{}, %{})
   end
 
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def sequence(program, {base, args}, action, screen, payload) do
     case tick(program, base, args) do
       {:end, _} ->
