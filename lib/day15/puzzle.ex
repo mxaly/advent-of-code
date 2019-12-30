@@ -9,8 +9,6 @@ defmodule Day15 do
     %{arg: 4, x: 1, y: 0}
   ]
 
-  # def get_unexplored(screen, {x, y}) do get_unexplored(screen, {x, y}, []) end
-
   def get_unexplored(map, {x, y}) do
     @directions
     |> Enum.map(fn %{arg: d, x: dx, y: dy} ->
@@ -20,7 +18,6 @@ defmodule Day15 do
     |> Enum.map(fn {d, _v} -> d end)
   end
 
-  # def step(program, {base, args}, {x, y}, %{arg: direction, x: dx, y: dy}, map, pid) do
   def step(cpu, {x, y}, %{arg: direction, x: dx, y: dy}, map, pid) do
     case tick(%CPU{cpu | args: [direction]}) do
       {:end, _} ->
@@ -56,8 +53,6 @@ defmodule Day15 do
 
   def sequence(cpu, current_point, directions, map, pid) do
     # Process.sleep(50)
-
-    {x, y} = current_point
     # send(pid, {:print})
 
     directions
@@ -76,7 +71,7 @@ defmodule Day15 do
           [{point, sign}]
         end
       end,
-      timeout: 50_000_000,
+      # timeout: 500_000,
       max_concurrency: 500
     )
     |> Enum.flat_map(fn {:ok, map} -> map end)
@@ -118,7 +113,6 @@ defmodule Day15 do
     if Enum.find_value(new_map, fn {_k, value} -> value == "." end) do
       fill_oxygen(new_map |> Map.new(), pid, hours + 1)
     else
-      # send(pid, {:print})
       {map |> Map.new(), hours}
     end
   end
@@ -126,7 +120,7 @@ defmodule Day15 do
   def run() do
     {:ok, pid} = Screen.start_link()
 
-    {map, hours} =
+    {_map, hours} =
       CPU.code_from_file("files/day15.txt")
       |> sequence(pid)
       |> Map.new()
